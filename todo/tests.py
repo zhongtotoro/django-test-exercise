@@ -37,3 +37,20 @@ class TaskModelTestCase(TestCase):
         task.save()
 
         self.assertFalse(task.is_overdue(current))
+
+    # 5つ目：締切を過ぎている（過去）場合のテスト
+    def test_is_overdue_past(self):
+        due = timezone.make_aware(datetime(2024, 6, 30, 23, 59, 59))
+        current = timezone.make_aware(datetime(2024, 7, 1, 0, 0, 0)) # 現在時刻が締切より後
+        task = Task(title='task1', due_at=due)
+        task.save()
+
+        self.assertTrue(task.is_overdue(current))
+
+    # 6つ目：締切が設定されていない（None）場合のテスト
+    def test_is_overdue_none(self):
+        current = timezone.make_aware(datetime(2024, 6, 30, 0, 0, 0))
+        task = Task(title='task2') # due_atを指定しない
+        task.save()
+
+        self.assertFalse(task.is_overdue(current))
